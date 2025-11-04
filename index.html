@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>✅ Checklist Interativo — Dark</title>
+  <title>✅ Conferência de Cadastro de Produto — Dark</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root{
@@ -12,7 +12,7 @@
     *{box-sizing:border-box}
     html,body{height:100%}
     body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,'Noto Sans',sans-serif;background:linear-gradient(180deg,#0b0f14,#0c1117);color:var(--text)}
-    .container{max-width:900px;margin:40px auto;padding:24px}
+    .container{max-width:980px;margin:40px auto;padding:24px}
     .card{background:linear-gradient(180deg,#0e141b,#0b1118);border:1px solid #1f2a3a;border-radius:16px;box-shadow:0 10px 30px #00000055}
     .header{display:flex;gap:16px;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #1d2736}
     .title{display:flex;gap:12px;align-items:center;font-weight:700}
@@ -27,15 +27,16 @@
     .btn.danger{border-color:#5b2323;background:#1a0e0e}
     .btn.icon{display:flex;align-items:center;gap:8px}
 
-    .toolbar{display:flex;gap:12px;flex-wrap:wrap;padding:16px 24px;border-bottom:1px solid #1d2736}
-    .field{display:flex;gap:8px;align-items:center;background:#0e151e;border:1px solid #223044;border-radius:12px;padding:8px 10px}
-    .field input[type="text"]{background:transparent;border:none;outline:none;color:var(--text);min-width:260px}
+    .toolbar{display:grid;grid-template-columns:repeat(4,1fr) auto;gap:12px;align-items:end;padding:16px 24px;border-bottom:1px solid #1d2736}
+    .field{display:flex;flex-direction:column;gap:6px;background:#0e151e;border:1px solid #223044;border-radius:12px;padding:10px}
+    .field label{font-size:12px;color:var(--sub)}
+    .field input[type="text"]{background:transparent;border:none;outline:none;color:var(--text);font-weight:600}
     .select{appearance:none;background:#0e151e;border:1px solid #223044;color:var(--text);padding:10px 12px;border-radius:12px}
 
     .progress{padding:16px 24px;display:flex;gap:16px;align-items:center}
     .bar{flex:1;height:10px;background:#111827;border:1px solid #1f2a3a;border-radius:999px;overflow:hidden}
     .bar > span{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--acc),#6ad1ff)}
-    .meter{min-width:140px;text-align:right;color:var(--sub);font-size:14px}
+    .meter{min-width:160px;text-align:right;color:var(--sub);font-size:14px}
 
     .list{padding:8px 12px 18px}
     .item{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:center;padding:12px 10px;margin:8px 0;border-radius:12px;background:linear-gradient(180deg,#0e141c,#0c1219);border:1px solid #1e293b}
@@ -53,17 +54,20 @@
     .ghost{opacity:.65}
 
     .footer{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-top:1px solid #1d2736;color:var(--sub);font-size:13px}
-    .link{color:#9ac5ff;text-decoration:none;border-bottom:1px dashed #3b74b6}
+
+    @media (max-width:820px){
+      .toolbar{grid-template-columns:1fr 1fr}
+    }
 
     @media (max-width:560px){
       .item{grid-template-columns:28px 1fr}
       .actions{grid-column:1/-1}
-      .meter{min-width:90px}
+      .meter{min-width:120px}
     }
 
     /* Print-friendly */
     @media print{
-      .btn, .toolbar, .footer{display:none !important}
+      .btn, .footer{display:none !important}
       body{background:#fff;color:#000}
       .card{background:#fff;border:1px solid #ccc;box-shadow:none}
       .item{background:#fff;border-color:#ccc}
@@ -76,27 +80,26 @@
     <div class="card" id="app">
       <div class="header">
         <div class="title">
-          <span style="font-size:22px">✅ Checklist Interativo</span>
+          <span style="font-size:22px">✅ Conferência de Cadastro de Produto</span>
           <span class="badge">Dark • Offline • Salva automático</span>
         </div>
         <div class="controls">
-          <button class="btn ok icon" id="btnClearDone" title="Remover conclUídos"><span>🧹</span>Limpar concluídos</button>
-          <button class="btn primary icon" id="btnExport" title="Exportar JSON"><span>📤</span>Exportar</button>
-          <label class="btn icon" title="Importar JSON" for="fileImport"><span>📥</span>Importar</label>
+          <button class="btn ok icon" id="btnClearDone" title="Remover concluídos"><span>🧹</span>Limpar concluídos</button>
+          <button class="btn primary icon" id="btnExport" title="Exportar backup (JSON)"><span>📤</span>Exportar</button>
+          <label class="btn icon" title="Importar backup (JSON)" for="fileImport"><span>📥</span>Importar</label>
           <input id="fileImport" type="file" accept="application/json" hidden />
         </div>
       </div>
 
-      <div class="toolbar">
-        <div class="field" style="flex:1">
-          <span>➕</span>
-          <input id="newText" type="text" placeholder="Adicionar item… (Enter adiciona)" />
+      <!-- Dados do produto (versão 1: manual, sem validação) -->
+      <div class="toolbar" id="productForm">
+        <div class="field"><label>🏷️ SKU</label><input id="fSku" type="text" placeholder="Ex.: P-1234" /></div>
+        <div class="field"><label>📝 Descrição</label><input id="fDesc" type="text" placeholder="Nome do produto" /></div>
+        <div class="field"><label>📦 NCM</label><input id="fNcm" type="text" placeholder="Ex.: 2309.90.10" /></div>
+        <div class="field"><label>📇 EAN/GTIN</label><input id="fGtin" type="text" placeholder="Ex.: 7890000000000" /></div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn" id="btnClearForm" title="Limpar campos">Limpar campos</button>
         </div>
-        <select id="filter" class="select" title="Filtrar itens">
-          <option value="all">Mostrar: Todos</option>
-          <option value="todo">Mostrar: Pendentes</option>
-          <option value="done">Mostrar: Concluídos</option>
-        </select>
       </div>
 
       <div class="progress">
@@ -104,37 +107,11 @@
         <div class="meter"><span id="countDone">0</span>/<span id="countTotal">0</span> • <span id="pct">0%</span></div>
       </div>
 
-      <div class="list" id="list">
-        <!-- Itens padrão (editáveis) → se existir storage, serão substituídos -->
-        <div class="item" data-id="seed-1">
-          <div class="check" role="checkbox" aria-checked="false" tabindex="0"></div>
-          <div class="text" contenteditable="true">Definir objetivo do painel</div>
-          <div class="actions">
-            <span class="pill">Planejamento</span>
-            <button class="btn danger" data-action="del">Excluir</button>
-          </div>
-        </div>
-        <div class="item" data-id="seed-2">
-          <div class="check" role="checkbox" aria-checked="false" tabindex="0"></div>
-          <div class="text" contenteditable="true">Coletar dados de origem (CSV/Planilha)</div>
-          <div class="actions">
-            <span class="pill">Dados</span>
-            <button class="btn danger" data-action="del">Excluir</button>
-          </div>
-        </div>
-        <div class="item" data-id="seed-3">
-          <div class="check" role="checkbox" aria-checked="false" tabindex="0"></div>
-          <div class="text" contenteditable="true">Validar consistências e regras</div>
-          <div class="actions">
-            <span class="pill">Qualidade</span>
-            <button class="btn danger" data-action="del">Excluir</button>
-          </div>
-        </div>
-      </div>
+      <div class="list" id="list"></div>
 
       <div class="footer">
-        <div><span class="ghost">Dica:</span> Duplo clique no texto para editar. Tudo salva automático (localStorage).</div>
-        <div>Feito com <span aria-hidden>🖤</span> — versão <strong>1.0</strong></div>
+        <div><span class="ghost">Dica:</span> Preencha os campos do produto e marque cada conferência. Tudo salva automático no navegador (localStorage).</div>
+        <div>Feito com 🖤 — versão <strong>2.0 (Cadastro)</strong></div>
       </div>
     </div>
   </div>
@@ -147,10 +124,8 @@
     (function(){
       const $ = (q,el=document)=>el.querySelector(q);
       const $$ = (q,el=document)=>Array.from(el.querySelectorAll(q));
-      const STORAGE_KEY = 'checklist_v1';
+      const STORAGE_KEY = 'checklist_v2_cadastro';
       const listEl = $('#list');
-      const newText = $('#newText');
-      const filter = $('#filter');
       const barFill = $('#barFill');
       const countDone = $('#countDone');
       const countTotal = $('#countTotal');
@@ -159,31 +134,58 @@
       const btnClearDone = $('#btnClearDone');
       const fileImport = $('#fileImport');
 
+      // Form fields
+      const fSku = $('#fSku');
+      const fDesc = $('#fDesc');
+      const fNcm = $('#fNcm');
+      const fGtin = $('#fGtin');
+      const btnClearForm = $('#btnClearForm');
+
       /** Data **/
-      let items = load() || domSeed();
+      let state = load() || seed();
 
       function uid(){return Math.random().toString(36).slice(2,9)}
 
-      function domSeed(){
-        return $$('.item', listEl).map(el=>({
-          id: el.dataset.id || uid(),
-          text: $('.text', el).textContent.trim(),
-          done: $('.check', el).classList.contains('done'),
-          tag: ($('.pill', el)?.textContent||'')
-        }));
+      function seed(){
+        return {
+          form:{sku:'', desc:'', ncm:'', gtin:''},
+          items:[
+            {id:uid(), text:'Conferir SKU preenchido e padronizado', done:false, tag:'Obrigatório'},
+            {id:uid(), text:'Conferir DESCRIÇÃO clara e no padrão interno', done:false, tag:'Obrigatório'},
+            {id:uid(), text:'Conferir NCM compatível com o produto', done:false, tag:'Obrigatório'},
+            {id:uid(), text:'Conferir EAN/GTIN válido (código de barras)', done:false, tag:'Obrigatório'}
+          ]
+        };
       }
 
-      function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
+      function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
       function load(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||''); }catch(e){ return null; } }
 
-      /** Render **/
+      // Bind form
+      function applyForm(){
+        fSku.value = state.form.sku||'';
+        fDesc.value = state.form.desc||'';
+        fNcm.value = state.form.ncm||'';
+        fGtin.value = state.form.gtin||'';
+      }
+      function attachFormEvents(){
+        [fSku,fDesc,fNcm,fGtin].forEach((inp)=>{
+          inp.addEventListener('input', ()=>{
+            state.form = {sku:fSku.value.trim(), desc:fDesc.value.trim(), ncm:fNcm.value.trim(), gtin:fGtin.value.trim()};
+            save();
+          });
+        });
+        btnClearForm.addEventListener('click', ()=>{
+          fSku.value=fDesc.value=fNcm.value=fGtin.value='';
+          state.form = {sku:'',desc:'',ncm:'',gtin:''};
+          save();
+        });
+      }
+
+      /** Render checklist **/
       function render(){
         listEl.innerHTML = '';
-        let visible = items;
-        if(filter.value==='todo') visible = items.filter(i=>!i.done);
-        if(filter.value==='done') visible = items.filter(i=>i.done);
-
-        for(const it of visible){
+        for(const it of state.items){
           const row = document.createElement('div');
           row.className = 'item';
           row.dataset.id = it.id;
@@ -202,8 +204,8 @@
       }
 
       function updateProgress(){
-        const total = items.length;
-        const done = items.filter(i=>i.done).length;
+        const total = state.items.length;
+        const done = state.items.filter(i=>i.done).length;
         const p = total ? Math.round((done/total)*100) : 0;
         countTotal.textContent = total;
         countDone.textContent = done;
@@ -212,7 +214,7 @@
       }
 
       function escapeHtml(s){
-        return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]));
+        return String(s).replace(/[&<>"]|'/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]||m));
       }
 
       /** Events **/
@@ -221,11 +223,11 @@
         if(!row) return;
         const id = row.dataset.id;
         if(e.target.closest('.check')){
-          const it = items.find(i=>i.id===id); if(!it) return;
+          const it = state.items.find(i=>i.id===id); if(!it) return;
           it.done = !it.done; save(); render();
         }
         if(e.target.matches('[data-action="del"]')){
-          items = items.filter(i=>i.id!==id); save(); render();
+          state.items = state.items.filter(i=>i.id!==id); save(); render();
         }
       });
 
@@ -238,33 +240,23 @@
       listEl.addEventListener('blur', e=>{
         if(e.target.classList.contains('text')){
           const row = e.target.closest('.item');
-          const it = items.find(i=>i.id===row.dataset.id);
+          const it = state.items.find(i=>i.id===row.dataset.id);
           if(it){ it.text = e.target.textContent.trim(); save(); updateProgress(); }
         }
       }, true);
 
-      newText.addEventListener('keydown', e=>{
-        if(e.key==='Enter') addItem();
-      });
-
-      function addItem(){
-        const text = newText.value.trim(); if(!text) return;
-        items.unshift({id:uid(), text, done:false, tag:''});
-        newText.value=''; save(); render();
-      }
-
-      filter.addEventListener('change', render);
-
+      // Export/Import backup
       btnExport.addEventListener('click', ()=>{
-        const blob = new Blob([JSON.stringify(items,null,2)], {type:'application/json'});
+        const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url; a.download = 'checklist.json'; a.click();
+        const sku = state.form.sku?`_${state.form.sku}`:'';
+        a.href = url; a.download = `cadastro_checklist${sku}.json`; a.click();
         URL.revokeObjectURL(url);
       });
 
       btnClearDone.addEventListener('click', ()=>{
-        items = items.filter(i=>!i.done); save(); render();
+        state.items = state.items.filter(i=>!i.done); save(); render();
       });
 
       fileImport.addEventListener('change', async (e)=>{
@@ -272,16 +264,32 @@
         const txt = await f.text();
         try{
           const data = JSON.parse(txt);
-          if(Array.isArray(data)){
-            items = data.filter(x=>x && typeof x.text==='string').map(x=>({
+          if(data && Array.isArray(data.items) && data.form){
+            state = {
+              form:{
+                sku: String(data.form.sku||''),
+                desc: String(data.form.desc||''),
+                ncm: String(data.form.ncm||''),
+                gtin: String(data.form.gtin||'')
+              },
+              items: data.items.filter(x=>x && typeof x.text==='string').map(x=>({
+                id: x.id || uid(), text: String(x.text), done: !!x.done, tag: x.tag?String(x.tag):''
+              }))
+            };
+            save(); applyForm(); render();
+          } else if (Array.isArray(data)) { // retrocompatível com v1 (lista simples)
+            state.items = data.filter(x=>x && typeof x.text==='string').map(x=>({
               id: x.id || uid(), text: String(x.text), done: !!x.done, tag: x.tag?String(x.tag):''
             }));
             save(); render();
-          }else{ alert('Arquivo inválido.'); }
+          } else { alert('Arquivo inválido.'); }
         }catch(err){ alert('JSON inválido.'); }
         fileImport.value='';
       });
 
+      // Init
+      applyForm();
+      attachFormEvents();
       render();
     })();
   </script>
